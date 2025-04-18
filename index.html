@@ -1,296 +1,77 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>abogadosjuridicos.org - Soluciones Legales Completas</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <style>
-        /* Apply Inter font globally */
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Add subtle animation for sections */
-        .section-fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-        }
-        .section-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        /* Style for hero background image */
-        .hero-bg {
-            background-image: url('https://files.catbox.moe/9dut93.png'); /* [Imagen de Balanza de la justicia y mazo] */
-            background-size: cover;
-            background-position: center;
-        }
-        /* Add error handling for image loading */
-        img[onerror] {
-           visibility: hidden; /* Hide broken image icon */
-           background-color: #eee;
-           display: inline-block;
-        }
-        /* Styles for form status message */
-        #form-status {
-            margin-top: 1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            text-align: center;
-            font-weight: 500;
-        }
-        .status-success {
-            background-color: #d1fae5; /* green-100 */
-            color: #065f46; /* green-800 */
-        }
-        .status-error {
-            background-color: #fee2e2; /* red-100 */
-            color: #991b1b; /* red-800 */
-        }
-         .status-sending {
-            background-color: #e0e7ff; /* indigo-100 */
-            color: #3730a3; /* indigo-800 */
-        }
-    </style>
-</head>
-<body class="bg-gray-50">
+/*****
+ * Google Apps Script para recibir datos de un formulario HTML y guardarlos en una hoja de cálculo.
+ * Asegúrate de que la hoja activa tenga columnas con los encabezados correspondientes.
+ * Orden esperado: Timestamp, Fuente, Nombre, Email, Telefono, AreaInteres, Mensaje
+ *****/
 
-    <header class="bg-white shadow-md sticky top-0 z-50">
-        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <div class="flex items-center">
-                <img src="https://files.catbox.moe/5x8gfs.png" alt="Logo de abogadosjuridicos.org" class="h-10 w-auto mr-3 rounded" onerror="this.style.display='none'">
-                <a href="#" class="text-2xl font-bold text-gray-800">abogadosjuridicos.org</a>
-            </div>
-            <div>
-                <a href="#contacto" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">Contacto Rápido</a>
-            </div>
-        </nav>
-    </header>
+// Hoja de cálculo donde se guardarán los datos.
+const SHEET_NAME = 'abogadosjuridicos.org';
+// Fuente fija para identificar los envíos de este formulario.
+const SOURCE_ID = 'LandingMerchan';
+// Obtiene la hoja de cálculo activa y la hoja específica por nombre.
+const SPREADSHEET = SpreadsheetApp.getActiveSpreadsheet();
+const SHEET = SPREADSHEET.getSheetByName(SHEET_NAME);
 
-    <section class="hero-bg text-white relative">
-        <div class="absolute inset-0 bg-black opacity-50"></div>
-        <div class="container mx-auto px-6 py-24 md:py-32 lg:py-40 text-center relative z-10">
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">Soluciones Legales Integrales</h1>
-            <p class="text-lg md:text-xl lg:text-2xl mb-8 text-gray-200">Asesoría experta en todas las áreas del derecho para particulares y empresas.</p>
-            <a href="#servicios" class="bg-white text-indigo-600 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition duration-300 text-lg">Descubra Nuestros Servicios</a>
-        </div>
-    </section>
+/**
+ * Función que se ejecuta cuando se recibe una solicitud POST (desde el formulario HTML).
+ * @param {Object} e - El objeto del evento que contiene los parámetros de la solicitud.
+ * @returns {Object} - Un objeto JSON indicando el resultado (success o error).
+ */
+function doPost(e) {
+  try {
+    // Verifica si la hoja de destino existe.
+    if (!SHEET) {
+      throw new Error(`Hoja "${SHEET_NAME}" no encontrada. Verifica que el nombre de la hoja en tu Google Sheet sea exacto.`);
+    }
 
-    <section id="nosotros" class="py-16 md:py-24 bg-white section-fade-in">
-        <div class="container mx-auto px-6 text-center">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Su Socio Legal de Confianza</h2>
-            <p class="text-gray-600 max-w-3xl mx-auto mb-10 text-lg">
-                En abogadosjuridicos.org, entendemos que los desafíos legales pueden ser complejos y estresantes. Nuestro equipo multidisciplinario de abogados experimentados está dedicado a ofrecerle una asesoría clara, estratégica y efectiva, cubriendo todo el espectro del derecho. Nos comprometemos con la defensa de sus intereses.
-            </p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-                <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Experiencia Comprobada</h3>
-                    <p class="text-gray-600">Años de práctica exitosa en diversas ramas del derecho respaldan nuestra capacidad para manejar su caso.</p>
-                </div>
-                <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Enfoque Integral</h3>
-                    <p class="text-gray-600">Ofrecemos una visión completa, abordando todas las implicaciones legales de su situación.</p>
-                </div>
-                <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Atención Personalizada</h3>
-                    <p class="text-gray-600">Cada cliente es único. Adaptamos nuestras estrategias a sus necesidades específicas.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    // Obtiene los datos del formulario del objeto del evento.
+    const formData = e.parameter;
 
-    <section id="servicios" class="py-16 md:py-24 bg-gray-50 section-fade-in">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-12 text-center">Áreas de Práctica</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 text-center">
-                    <i class="fas fa-scale-balanced text-4xl text-indigo-600 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Derecho Civil</h3>
-                    <p class="text-gray-600">Contratos, herencias, inmobiliario, reclamaciones de cantidad, familia, etc.</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 text-center">
-                    <i class="fas fa-gavel text-4xl text-indigo-600 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Derecho Penal</h3>
-                    <p class="text-gray-600">Defensa y acusación en todo tipo de delitos, asistencia al detenido.</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 text-center">
-                    <i class="fas fa-briefcase text-4xl text-indigo-600 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Derecho Mercantil</h3>
-                    <p class="text-gray-600">Constitución de sociedades, contratos mercantiles, concursal.</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 text-center">
-                    <i class="fas fa-users text-4xl text-indigo-600 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Derecho Laboral</h3>
-                    <p class="text-gray-600">Despidos, reclamaciones salariales, incapacidades, seguridad social.</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 text-center">
-                    <i class="fas fa-landmark text-4xl text-indigo-600 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Derecho Administrativo</h3>
-                    <p class="text-gray-600">Recursos, sanciones, licencias, extranjería, función pública.</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 text-center">
-                    <i class="fas fa-plus text-4xl text-indigo-600 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Y Muchas Más...</h3>
-                    <p class="text-gray-600">Consúltenos sobre su caso específico. Cubrimos todas las ramas del derecho.</p>
-                </div>
-            </div>
-             <p class="text-center text-gray-600 mt-12 text-lg">¿No ve su área específica? <a href="#contacto" class="text-indigo-600 hover:underline font-semibold">Contáctenos</a> para discutir sus necesidades.</p>
-        </div>
-    </section>
+    // Crea una nueva fila con los datos.
+    // ¡Orden de columnas actualizado! Mensaje es ahora la última.
+    const newRow = [
+      new Date(),         // Timestamp (Columna 1)
+      SOURCE_ID,          // Fuente (Columna 2)
+      formData.name || '',    // Nombre (Columna 3)
+      formData.email || '',   // Email (Columna 4)
+      formData.phone || '',   // Telefono (Columna 5 - Opcional)
+      formData.area || '',     // Área de Interés (Columna 6) - Movido
+      formData.message || ''  // Mensaje (Columna 7) - Movido al final
+    ];
 
-     <section id="testimonios" class="py-16 md:py-24 bg-indigo-50 section-fade-in">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-12 text-center">Lo Que Dicen Nuestros Clientes</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <p class="text-gray-600 italic mb-4">"abogadosjuridicos.org me guió a través de un proceso complicado con profesionalismo y claridad. ¡Altamente recomendados!"</p>
-                    <p class="font-semibold text-gray-800">- Juan Pérez</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <p class="text-gray-600 italic mb-4">"Su enfoque integral fue clave para resolver mi asunto legal de manera favorable. Un equipo excepcional."</p>
-                    <p class="font-semibold text-gray-800">- Sofía López</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <p class="text-gray-600 italic mb-4">"Desde el primer contacto, sentí que mis intereses estaban en buenas manos. Gracias por su dedicación."</p>
-                    <p class="font-semibold text-gray-800">- Carlos Martínez</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    // Añade la nueva fila a la hoja de cálculo.
+    // LockService previene errores si llegan múltiples envíos casi al mismo tiempo.
+    const lock = LockService.getScriptLock();
+    lock.waitLock(30000); // Espera hasta 30 segundos para obtener el bloqueo
 
-    <section id="contacto" class="py-16 md:py-24 bg-white section-fade-in">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-12 text-center">Contacte con Nosotros</h2>
-            <div class="flex flex-wrap -mx-4">
-                <div class="w-full lg:w-1/2 px-4 mb-8 lg:mb-0">
-                    <form id="contact-form" class="bg-gray-100 p-8 rounded-lg shadow-md">
-                         <p class="text-gray-700 mb-6">Envíenos su consulta y le responderemos a la brevedad posible. O contáctenos directamente por WhatsApp.</p>
-                        <div class="mb-4">
-                            <label for="name" class="block text-gray-700 font-semibold mb-2">Nombre Completo</label>
-                            <input type="text" id="name" name="name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="email" class="block text-gray-700 font-semibold mb-2">Correo Electrónico</label>
-                            <input type="email" id="email" name="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="phone" class="block text-gray-700 font-semibold mb-2">Teléfono (Opcional)</label>
-                            <input type="tel" id="phone" name="phone" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
-                        <div class="mb-6">
-                            <label for="message" class="block text-gray-700 font-semibold mb-2">Mensaje / Consulta</label>
-                            <textarea id="message" name="message" rows="5" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required></textarea>
-                        </div>
-                        <div class="text-center">
-                            <button type="submit" id="submit-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 w-full md:w-auto">Enviar Mensaje</button>
-                        </div>
-                        <div id="form-status" class="hidden"></div>
-                    </form>
-                </div>
-                <div class="w-full lg:w-1/2 px-4">
-                    <div class="bg-gray-100 p-8 rounded-lg shadow-md">
-                        <div>
-                            <h3 class="text-2xl font-semibold text-gray-800 mb-4">Información de Contacto</h3>
-                            <p class="text-gray-700 mb-3 flex items-center">
-                                <i class="fab fa-whatsapp text-green-500 text-xl mr-2"></i> <strong class="font-semibold mr-1">WhatsApp:</strong>
-                                <a href="https://wa.me/525638774866" target="_blank" class="text-indigo-600 hover:underline">+52 56 3877 4866</a>
-                            </p>
-                            <p class="text-gray-700 mb-4"><strong class="font-semibold">Horario:</strong> Lunes a Domingo: 9:00 AM - 10:00 PM</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    try {
+        SHEET.appendRow(newRow);
+    } finally {
+        lock.releaseLock(); // Libera el bloqueo
+    }
 
-    <footer class="bg-gray-800 text-gray-300 py-8">
-        <div class="container mx-auto px-6 text-center">
-            <p>&copy; <span id="currentYear"></span> abogadosjuridicos.org. Todos los derechos reservados.</p>
-            <p class="text-sm mt-2">
-                <a href="#" class="hover:underline">Política de Privacidad</a> | <a href="#" class="hover:underline">Términos de Servicio</a>
-            </p>
-        </div>
-    </footer>
 
-    <script>
-        // Set current year in footer
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    // Devuelve una respuesta JSON de éxito.
+    return ContentService
+      .createTextOutput(JSON.stringify({ result: 'success', message: 'Fila añadida correctamente.' }))
+      .setMimeType(ContentService.MimeType.JSON);
 
-        // Simple intersection observer for fade-in effect
-        const sections = document.querySelectorAll('.section-fade-in');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('section-visible');
-                }
-            });
-        }, { threshold: 0.1 });
+  } catch (error) {
+    // Registra el error en los registros de Apps Script para depuración.
+    Logger.log(`Error en doPost: ${error.message}\nStack: ${error.stack}`);
+    Logger.log(`Datos recibidos (e.parameter): ${JSON.stringify(e.parameter)}`);
 
-        sections.forEach(section => {
-            observer.observe(section);
-        });
 
-        // --- Google Sheets Form Submission ---
-        const form = document.getElementById('contact-form');
-        const submitButton = document.getElementById('submit-button');
-        const formStatus = document.getElementById('form-status');
+    // Devuelve una respuesta JSON de error detallada.
+    return ContentService
+      .createTextOutput(JSON.stringify({ result: 'error', message: `Error interno del servidor: ${error.message}` }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
 
-        // URL del Web App de Google Apps Script ¡Actualizada!
-        const googleScriptURL = 'https://script.google.com/macros/s/AKfycbwYdMU0nH3CMpNJODVbmm5TxtGmb6fcRM4u0SLdy56KzM1zV6dnw2dEhPug_tTIzNVBQA/exec';
-
-        if (form) {
-            form.addEventListener('submit', (e) => {
-                e.preventDefault(); // Prevent default form submission
-
-                // Show sending message and disable button
-                formStatus.textContent = 'Enviando mensaje...';
-                formStatus.className = 'status-sending'; // Use className to replace all classes
-                formStatus.classList.remove('hidden');
-                submitButton.disabled = true;
-                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
-
-                const formData = new FormData(form);
-
-                fetch(googleScriptURL, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json()) // Assuming your script returns JSON
-                .then(data => {
-                    if (data.result === 'success') { // Check the response from your script
-                        formStatus.textContent = 'Mensaje enviado con éxito!';
-                        formStatus.className = 'status-success';
-                        form.reset(); // Clear the form
-                    } else {
-                        // If script indicates failure or unexpected response
-                        throw new Error(data.message || 'Hubo un problema al enviar el mensaje.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error submitting form:', error);
-                    formStatus.textContent = `Error: ${error.message || 'No se pudo enviar el mensaje. Intenta de nuevo.'}`;
-                    formStatus.className = 'status-error';
-                })
-                .finally(() => {
-                    // Re-enable button after request finishes (success or error)
-                    submitButton.disabled = false;
-                    submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                    // Optionally hide status message after a delay
-                    setTimeout(() => {
-                         if (formStatus.className !== 'status-sending') { // Don't hide if still sending (unlikely but safe)
-                            formStatus.classList.add('hidden');
-                         }
-                    }, 5000); // Hide after 5 seconds
-                });
-            });
-        }
-    </script>
-
-</body>
-</html>
-
+// --- Opcional: Función doGet para probar si el script está funcionando ---
+/*
+function doGet(e) {
+  return HtmlService.createHtmlOutput("El script de Google Apps está activo y configurado para la hoja: " + SHEET_NAME);
+}
+*/
