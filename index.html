@@ -13,17 +13,96 @@
         /* Apply Inter font globally */
         body {
             font-family: 'Inter', sans-serif;
+            overflow-x: hidden; /* Prevent horizontal scrollbar potentially caused by animations */
         }
-        /* Add subtle animation for sections */
-        .section-fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+
+        /* --- Animation Keyframes --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes fadeIn {
+             from { opacity: 0; }
+             to { opacity: 1; }
+        }
+        /* Keyframe for Icon Entrance - Updated */
+        @keyframes iconPopIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            60% { transform: scale(1.1); opacity: 1; } /* Slight overshoot */
+            100% { transform: scale(1); opacity: 1; } /* Ensure final opacity is 1 */
+        }
+
+        /* --- Base Animation Styles --- */
+        .animate-on-scroll {
+            opacity: 0; /* Start sections hidden */
+        }
+
+        /* --- Section Entrance Animation --- */
         .section-visible {
-            opacity: 1;
-            transform: translateY(0);
+             animation: fadeIn 0.8s ease-out forwards;
         }
+         /* Card Entrance Animation */
+        .section-visible .grid > div {
+             opacity: 0;
+             animation: fadeInUp 0.6s ease-out forwards;
+        }
+        /* Stagger animation delays for grid items (Cards) */
+        .section-visible .grid > div:nth-child(1) { animation-delay: 0.1s; }
+        .section-visible .grid > div:nth-child(2) { animation-delay: 0.2s; }
+        .section-visible .grid > div:nth-child(3) { animation-delay: 0.3s; }
+        .section-visible .grid > div:nth-child(4) { animation-delay: 0.4s; } /* For 4-column grid */
+        .section-visible .grid > div:nth-child(5) { animation-delay: 0.5s; } /* For 3-column grid (services) */
+        .section-visible .grid > div:nth-child(6) { animation-delay: 0.6s; } /* For 3-column grid (services) */
+
+        /* Icon Entrance Animation - Updated */
+        .section-visible .grid i {
+            /* Removed opacity: 0; here - animation handles initial state */
+            animation: iconPopIn 0.5s ease-out forwards;
+            /* Delay icon animation relative to section visibility */
+             animation-delay: 0.4s; /* Adjust delay as needed */
+        }
+
+
+        /* --- Hero Text Animation --- */
+        .hero-bg h1 {
+            opacity: 0;
+            animation: fadeInUp 0.8s 0.2s ease-out forwards;
+        }
+        .hero-bg p {
+             opacity: 0;
+             animation: fadeInUp 0.8s 0.4s ease-out forwards;
+        }
+         .hero-bg a.inline-block { /* Target the specific hero button */
+             opacity: 0;
+             animation: fadeInUp 0.8s 0.6s ease-out forwards;
+         }
+
+
+        /* --- Card Hover Effects --- */
+        #nosotros .grid > div,
+        #servicios .grid > div,
+        #testimonios .grid > div {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        #nosotros .grid > div:hover,
+        #servicios .grid > div:hover,
+        #testimonios .grid > div:hover {
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Icon Hover Effects --- */
+        #nosotros .grid i,
+        #servicios .grid i {
+             display: inline-block;
+             transition: transform 0.3s ease-in-out;
+        }
+        #nosotros .grid > div:hover i,
+        #servicios .grid > div:hover i {
+            transform: rotate(10deg) scale(1.15);
+        }
+
+
         /* Style for hero background image */
         .hero-bg {
             background-image: url('https://files.catbox.moe/9dut93.png'); /* [Imagen de Balanza de la justicia y mazo] */
@@ -76,38 +155,46 @@
         <div class="absolute inset-0 bg-black opacity-50"></div>
         <div class="container mx-auto px-6 py-24 md:py-32 lg:py-40 text-center relative z-10">
             <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">Soluciones Legales Integrales</h1>
-            <p class="text-lg md:text-xl lg:text-2xl mb-8 text-gray-200">Asesoría experta en todas las áreas del derecho para particulares y empresas.</p>
-            <a href="#servicios" class="bg-white text-indigo-600 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition duration-300 text-lg">Descubra Nuestros Servicios</a>
+            <p class="text-lg md:text-xl lg:text-2xl mb-8 text-gray-200">Asesoría experta y con Inteligencia Artificial en todas las áreas del derecho para particulares y empresas.</p>
+            <a href="#servicios" class="inline-block bg-white text-indigo-600 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition duration-300 text-lg">Descubra Nuestros Servicios</a>
         </div>
     </section>
 
-    <section id="nosotros" class="py-16 md:py-24 bg-white section-fade-in">
+    <section id="nosotros" class="py-16 md:py-24 bg-white animate-on-scroll">
         <div class="container mx-auto px-6 text-center">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Su Socio Legal de Confianza</h2>
             <p class="text-gray-600 max-w-3xl mx-auto mb-10 text-lg">
                 En abogadosjuridicos.org, entendemos que los desafíos legales pueden ser complejos y estresantes. Nuestro equipo multidisciplinario de abogados experimentados está dedicado a ofrecerle una asesoría clara, estratégica y efectiva, cubriendo todo el espectro del derecho. Nos comprometemos con la defensa de sus intereses.
             </p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
                 <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Experiencia Comprobada</h3>
-                    <p class="text-gray-600">Años de práctica exitosa en diversas ramas del derecho respaldan nuestra capacidad para manejar su caso.</p>
+                     <div class="text-center mb-3"><i class="fas fa-medal text-3xl text-indigo-600"></i></div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 text-center">Experiencia Comprobada</h3>
+                    <p class="text-gray-600 text-center">Años de práctica exitosa en diversas ramas del derecho respaldan nuestra capacidad para manejar su caso.</p>
                 </div>
                 <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Enfoque Integral</h3>
-                    <p class="text-gray-600">Ofrecemos una visión completa, abordando todas las implicaciones legales de su situación.</p>
+                    <div class="text-center mb-3"><i class="fas fa-sitemap text-3xl text-indigo-600"></i></div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 text-center">Enfoque Integral</h3>
+                    <p class="text-gray-600 text-center">Ofrecemos una visión completa, abordando todas las implicaciones legales de su situación.</p>
                 </div>
                 <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Atención Personalizada</h3>
-                    <p class="text-gray-600">Cada cliente es único. Adaptamos nuestras estrategias a sus necesidades específicas.</p>
+                     <div class="text-center mb-3"><i class="fas fa-handshake-angle text-3xl text-indigo-600"></i></div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 text-center">Atención Personalizada</h3>
+                    <p class="text-gray-600 text-center">Cada cliente es único. Adaptamos nuestras estrategias a sus necesidades específicas.</p>
+                </div>
+                 <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
+                    <div class="text-center mb-3"><i class="fas fa-brain text-3xl text-indigo-600"></i></div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 text-center">Innovación con IA</h3>
+                    <p class="text-gray-600 text-center">Integramos inteligencia artificial para optimizar procesos y análisis, ofreciendo soluciones más eficientes.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="servicios" class="py-16 md:py-24 bg-gray-50 section-fade-in">
+    <section id="servicios" class="py-16 md:py-24 bg-gray-50 animate-on-scroll">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-12 text-center">Áreas de Práctica</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 text-center">
                     <i class="fas fa-scale-balanced text-4xl text-indigo-600 mb-4"></i>
                     <h3 class="text-xl font-semibold text-gray-800 mb-3">Derecho Civil</h3>
@@ -143,10 +230,10 @@
         </div>
     </section>
 
-     <section id="testimonios" class="py-16 md:py-24 bg-indigo-50 section-fade-in">
+     <section id="testimonios" class="py-16 md:py-24 bg-indigo-50 animate-on-scroll">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-12 text-center">Lo Que Dicen Nuestros Clientes</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <p class="text-gray-600 italic mb-4">"abogadosjuridicos.org me guió a través de un proceso complicado con profesionalismo y claridad. ¡Altamente recomendados!"</p>
                     <p class="font-semibold text-gray-800">- Juan Pérez</p>
@@ -163,7 +250,7 @@
         </div>
     </section>
 
-    <section id="contacto" class="py-16 md:py-24 bg-white section-fade-in">
+    <section id="contacto" class="py-16 md:py-24 bg-white animate-on-scroll">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-12 text-center">Contacte con Nosotros</h2>
             <div class="flex flex-wrap -mx-4">
@@ -179,8 +266,8 @@
                             <input type="email" id="email" name="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
                         </div>
                         <div class="mb-4">
-                            <label for="phone" class="block text-gray-700 font-semibold mb-2">Teléfono</label>
-                            <input type="tel" id="phone" name="phone" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                            <label for="phone" class="block text-gray-700 font-semibold mb-2">Teléfono (Opcional)</label>
+                            <input type="tel" id="phone" name="phone" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
                         <div class="mb-4">
                             <label for="area" class="block text-gray-700 font-semibold mb-2">Área de Interés</label>
@@ -210,7 +297,7 @@
                             <h3 class="text-2xl font-semibold text-gray-800 mb-4">Información de Contacto</h3>
                             <p class="text-gray-700 mb-3 flex items-center">
                                 <i class="fab fa-whatsapp text-green-500 text-xl mr-2"></i> <strong class="font-semibold mr-1">WhatsApp:</strong>
-                                <a href="https://wa.me/525638774866?text=Hola%2C%20me%20gustar%C3%ADa%20solicitar%20m%C3%A1s%20informaci%C3%B3n%2C%20y%20voy%20a%20hacer%20un%20resumen%20por%20escrito%20para%20que%20podamos%20avanzar%20sobre%20la%20informaci%C3%B3n%20de%20mi%28s%29%20caso%28s%29%2E%2E%2E%20y%20espero%20su%20respuesta...%20^^" target="_blank" class="text-indigo-600 hover:underline">+52 56 3877 4866</a>
+                                <a href="https://wa.me/525638774866?text=Hola%2C%20me%20gustar%C3%ADa%20solicitar%20m%C3%A1s%20informaci%C3%B3n%2C%20y%20voy%20a%20hacer%20un%20resumen%20por%20escrito%20para%20que%20podamos%20avanzar%20sobre%20la%20informaci%C3%B3n%20de%20mi%28s%29%20caso%28s%29%2E%2E%2E%20y%20espero%20su%20respuesta" target="_blank" class="text-indigo-600 hover:underline">+52 56 3877 4866</a>
                             </p>
                             <p class="text-gray-700 mb-4"><strong class="font-semibold">Horario:</strong> Lunes a Domingo: 9:00 AM - 10:00 PM</p>
                         </div>
@@ -229,7 +316,7 @@
         </div>
     </footer>
 
-    <a href="https://wa.me/525638774866?text=Hola%2C%20me%20gustar%C3%ADa%20solicitar%20m%C3%A1s%20informaci%C3%B3n%2C%20y%20voy%20a%20hacer%20un%20resumen%20por%20escrito%20para%20que%20podamos%20avanzar%20sobre%20la%20informaci%C3%B3n%20de%20mi%28s%29%20caso%28s%29%2E%2E%2E%20y%20espero%20su%20respuesta...%20^^"
+    <a href="https://wa.me/525638774866?text=Hola%2C%20me%20gustar%C3%ADa%20solicitar%20m%C3%A1s%20informaci%C3%B3n%2C%20y%20voy%20a%20hacer%20un%20resumen%20por%20escrito%20para%20que%20podamos%20avanzar%20sobre%20la%20informaci%C3%B3n%20de%20mi%28s%29%20caso%28s%29%2E%2E%2E%20y%20espero%20su%20respuesta"
        target="_blank"
        rel="noopener noreferrer"
        class="fixed bottom-5 right-5 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg z-50 transition duration-300 ease-in-out"
@@ -240,19 +327,27 @@
         // Set current year in footer
         document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        // Simple intersection observer for fade-in effect
-        const sections = document.querySelectorAll('.section-fade-in');
+        // --- Intersection Observer for Scroll Animations ---
+        const sectionsToAnimate = document.querySelectorAll('.animate-on-scroll');
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('section-visible');
+                    // observer.unobserve(entry.target); // Uncomment to animate only once
                 }
+                // else { // Uncomment to repeat animation on scroll up
+                //     entry.target.classList.remove('section-visible');
+                // }
             });
-        }, { threshold: 0.1 });
+        }, {
+            threshold: 0.1 // Adjust threshold as needed (0.1 means 10% visible)
+        });
 
-        sections.forEach(section => {
+        sectionsToAnimate.forEach(section => {
             observer.observe(section);
         });
+
 
         // --- Google Sheets Form Submission ---
         const form = document.getElementById('contact-form');
@@ -266,28 +361,25 @@
             form.addEventListener('submit', (e) => {
                 e.preventDefault(); // Prevent default form submission
 
-                // Show sending message and disable button
                 formStatus.textContent = 'Enviando mensaje...';
-                formStatus.className = 'status-sending'; // Use className to replace all classes
+                formStatus.className = 'status-sending';
                 formStatus.classList.remove('hidden');
                 submitButton.disabled = true;
                 submitButton.classList.add('opacity-50', 'cursor-not-allowed');
 
-                // FormData automatically includes the new 'area' select field
                 const formData = new FormData(form);
 
                 fetch(googleScriptURL, {
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.json()) // Assuming your script returns JSON
+                .then(response => response.json())
                 .then(data => {
-                    if (data.result === 'success') { // Check the response from your script
+                    if (data.result === 'success') {
                         formStatus.textContent = 'Mensaje enviado con éxito!';
                         formStatus.className = 'status-success';
-                        form.reset(); // Clear the form
+                        form.reset();
                     } else {
-                        // If script indicates failure or unexpected response
                         throw new Error(data.message || 'Hubo un problema al enviar el mensaje.');
                     }
                 })
@@ -297,15 +389,13 @@
                     formStatus.className = 'status-error';
                 })
                 .finally(() => {
-                    // Re-enable button after request finishes (success or error)
                     submitButton.disabled = false;
                     submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                    // Optionally hide status message after a delay
                     setTimeout(() => {
-                         if (formStatus.className !== 'status-sending') { // Don't hide if still sending (unlikely but safe)
+                         if (formStatus.className !== 'status-sending') {
                             formStatus.classList.add('hidden');
                          }
-                    }, 5000); // Hide after 5 seconds
+                    }, 5000);
                 });
             });
         }
@@ -313,4 +403,3 @@
 
 </body>
 </html>
-
